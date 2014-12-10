@@ -1,4 +1,4 @@
-package evo
+package evogo
 
 import (
 	"sync"

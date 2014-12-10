@@ -1,4 +1,4 @@
-package evo
+package evogo
 
 // Function type for the New Gene function
 type newgene func()Gene

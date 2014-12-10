@@ -1,4 +1,4 @@
-package evo
+package evogo
 
 
 // This is a population of individuals upon which various operations can be performed
