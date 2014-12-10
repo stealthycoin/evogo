@@ -9,7 +9,7 @@ Install
 
 Sample run of the provided hello_world example
 -----------
-Generation 1... Strongest Candidate: -180 Qahkz(faFugY(
+```Generation 1... Strongest Candidate: -180 Qahkz(faFugY(
 Generation 2... Strongest Candidate: -97 Qahkz.%h]ugY(
 Generation 3... Strongest Candidate: -75 Qahkz*!]cogY'
 Generation 4... Strongest Candidate: -46 Ielkz,!Sheqc#
@@ -31,4 +31,4 @@ Generation 19... Strongest Candidate: -1 Helko, World!
 Generation 20... Strongest Candidate: -1 Helko, World!
 Generation 21... Strongest Candidate: -1 Helko, World!
 Generation 22... Strongest Candidate: -1 Helko, World!
-Generation 23... Strongest Candidate: 0 Hello, World!
+Generation 23... Strongest Candidate: 0 Hello, World!```
