@@ -33,19 +33,20 @@ func MutateGene(g evo.Gene) evo.Gene {
 // if provided each generation will show the highest fitness individual
 func ShowGenes(i *evo.Individual) {
 	for _, g := range i.Genes() {
-		gene := g.(Gene)
+		gene := g.(Gene) // Typecast from evo.Gene interface to our Gene struct
 		fmt.Printf("%c", rune(gene.value))
 	}
 }
 
 // Define a fitness function to evaluate an individual
 // In our case we are just using distance between unicode runes
+// The higher the fitness is the cloesr to our goal the individual is
 func fitness(i *evo.Individual) int {
 	var f int = 0 // Highest score it can get is 0
 	for i, g := range i.Genes() {
 		gene := g.(Gene) // Need to typecast it from the eve.Gene interface to our custom Gene type
 		difference := int(goal[i]) - int(gene.value)
-		if difference > 0 {
+		if difference > 0 { // -abs
 			difference = -difference
 		}
 		f += difference  // Subtract off how far it is from the target
