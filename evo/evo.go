@@ -102,8 +102,6 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 	// Sort by fitness level
 	sort.Sort(pop)
 
-	fmt.Println(pop.individuals[0].fitness, pop.individuals[1].fitness)
-
 	// Create a pool to hold the next generation
 	nextGen := make([]*Individual,0)
 
