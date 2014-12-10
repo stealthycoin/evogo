@@ -5,11 +5,16 @@ Genetic Algoritm framework written in go
 
 Install
 -----------
-```go get github.com/stealthycoin/evogo```
+```$ go get github.com/stealthycoin/evogo```
+
+Install example program
+---------------
+```$ go install github.com/stealthycoin/evogo/examples/hello_world```
 
 Sample run of the provided hello_world example
 -----------
 ```
+$ hello_world
 Generation 1... Strongest Candidate: -180 Qahkz(faFugY(
 Generation 2... Strongest Candidate: -97 Qahkz.%h]ugY(
 Generation 3... Strongest Candidate: -75 Qahkz*!]cogY'
