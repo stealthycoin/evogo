@@ -1,5 +1,7 @@
 package evo
 
+import "math/rand"
+
 type Individual struct {
 	fitness int
 	chromosome []Gene
@@ -15,22 +17,29 @@ func newIndividualWithGenes(chrom []Gene) *Individual {
 }
 
 // Create a new individual
-func newIndividual(genesPerIndividual int, newGene newgene) *Individual {
+func newIndividual(minG, maxG int, newGene newgene) *Individual {
+	var genes int
+	if minG == maxG {
+		genes = minG
+	} else {
+		genes = minG + rand.Intn(maxG - minG)
+	}
+
 	rv :=  &Individual{
 		fitness: 0,
-		chromosome: make([]Gene, genesPerIndividual),
+		chromosome: make([]Gene, genes),
 	}
-	for i := 0 ; i < genesPerIndividual ; i++ {
+	for i := 0 ; i < len(rv.chromosome) ; i++ {
 		rv.chromosome[i] = newGene()
 	}
 	return rv;
 }
 
 // Create a given number of new individuals
-func newIndividuals(count, genesPerIndividual int, newGene newgene) []*Individual {
+func newIndividuals(count, minG, maxG int, newGene newgene) []*Individual {
 	rv := make([]*Individual, count)
 	for i := 0 ; i < count ; i++ {
-		rv[i] = newIndividual(genesPerIndividual, newGene)
+		rv[i] = newIndividual(minG, maxG, newGene)
 	}
 
 	return rv

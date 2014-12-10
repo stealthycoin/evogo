@@ -16,14 +16,14 @@ type Population struct {
 
 
 // Create a new population
-func NewPopulation(count, genesPerIndividual int, newGene newgene) *Population {
+func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 	return &Population{
 		invertFitness: false,
 		elitism: 5,
 		tProb: 75,
 		mProb: .2,
 		tournament: 20,
-		individuals: newIndividuals(count, genesPerIndividual, newGene),
+		individuals: newIndividuals(count, minG, maxG, newGene),
 		showGenes: func(*Individual){},
 	}
 }

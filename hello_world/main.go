@@ -60,7 +60,7 @@ func main() {
 	// 100 Individuals
 	// 13 Genes per individual
 	// And our custom CreateGene function used to make the genes
-	pop := evo.NewPopulation(1000, 13, CreateGene)
+	pop := evo.NewPopulation(1000, 13, 13, CreateGene)
 	pop.SetShowIndividual(ShowGenes) // Give it our show function
 
 	// Call the train function and provide it with
