@@ -19,10 +19,10 @@ type Population struct {
 func NewPopulation(count, genesPerIndividual int, newGene newgene) *Population {
 	return &Population{
 		invertFitness: false,
-		elitism: 0,
-		tProb: 5,
-		mProb: .05,
-		tournament: int(count / 2),
+		elitism: 5,
+		tProb: 75,
+		mProb: .2,
+		tournament: 20,
 		individuals: newIndividuals(count, genesPerIndividual, newGene),
 		showGenes: func(*Individual){},
 	}
@@ -51,7 +51,7 @@ func (p Population) Swap(i, j int) {
 
 func (p Population) Less(i, j int) bool {
 	if p.invertFitness {
-		return p.individuals[i].fitness > p.individuals[j].fitness
+		return p.individuals[i].fitness < p.individuals[j].fitness
 	}
-	return p.individuals[i].fitness < p.individuals[j].fitness
+	return p.individuals[i].fitness > p.individuals[j].fitness
 }

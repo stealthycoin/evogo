@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-	"strings"
 )
 
 var (
@@ -26,12 +25,7 @@ func CreateGene() evo.Gene {
 }
 
 func MutateGene(g evo.Gene) evo.Gene {
-	gene := g.(Gene)
-	i := strings.IndexRune(letters, rune(gene.value))
-	i += rand.Intn(5)
-	i %= len(letters)
-	gene.value = letters[i]
-	return gene
+	return CreateGene()
 }
 
 // Function to display an individual
@@ -62,7 +56,7 @@ func main() {
 	// 100 Individuals
 	// 13 Genes per individual
 	// And our custom CreateGene function used to make the genes
-	pop := evo.NewPopulation(100, 13, CreateGene)
+	pop := evo.NewPopulation(1000, 13, CreateGene)
 	pop.SetShowIndividual(ShowGenes)
 
 	// Call the train function and provide it with

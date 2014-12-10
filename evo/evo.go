@@ -102,6 +102,8 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 	// Sort by fitness level
 	sort.Sort(pop)
 
+	fmt.Println(pop.individuals[0].fitness, pop.individuals[1].fitness)
+
 	// Create a pool to hold the next generation
 	nextGen := make([]*Individual,0)
 
@@ -132,7 +134,7 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 // provide a fitness function and a cutoff
 // to stop training when that fitness is reached
 func Train(pop *Population, cutoff int, fit fitness, m mutate) {
-	maxGenerations := 1000
+	maxGenerations := 100
 	gen := 0
 
 	for gen < maxGenerations {
