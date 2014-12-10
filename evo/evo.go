@@ -17,6 +17,7 @@ func breedGeneration(pop *Population, fit fitness) {
 		wg.Add(1)
 		go func () {
 			individual.fitness = fit(individual)
+			wg.Done()
 		}()
 	}
 	wg.Wait()
