@@ -1,8 +1,5 @@
 package evo
 
-import (
-	"log"
-)
 
 // This is a population of individuals upon which various operations can be performed
 type Population struct {
@@ -14,9 +11,6 @@ func NewPopulation(count, genesPerIndividual int, newGene newgene) *Population {
 		individuals: newIndividuals(count, genesPerIndividual, newGene),
 	}
 
-	for _, i := range p.individuals {
-		log.Printf("%+v\n", i)
-	}
 	return p
 }
 
