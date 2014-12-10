@@ -3,7 +3,7 @@ evogo
 
 Genetic Algoritm framework written in go
 
-Install
+Install Package
 -----------
 ```$ go get github.com/stealthycoin/evogo```
 
