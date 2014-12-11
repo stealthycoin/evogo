@@ -22,7 +22,7 @@ type Gene struct {
 
 func CreateGene(i int) evogo.Gene {
 	return Gene{
-		state: i,
+		state: i+1,
 		choice: rand.Intn(4) + 1,
 	}
 }
