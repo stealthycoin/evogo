@@ -40,6 +40,10 @@ func (pop *Population) SetShowIndividual(fn genedisplay) {
 	pop.showGenes = fn
 }
 
+func (pop *Population) Individuals() []*Individual {
+	return pop.individuals
+}
+
 // Sorting functions for the individuals in the population
 func (p Population) Len() int {
 	return len(p.individuals)

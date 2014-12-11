@@ -1,7 +1,7 @@
 package evogo
 
 // Function type for the New Gene function
-type newgene func()Gene
+type newgene func(int)Gene
 
 // Function type for a mutation function on a gene
 type mutate func(Gene)Gene

@@ -30,7 +30,7 @@ func newIndividual(minG, maxG int, newGene newgene) *Individual {
 		chromosome: make([]Gene, genes),
 	}
 	for i := 0 ; i < len(rv.chromosome) ; i++ {
-		rv.chromosome[i] = newGene()
+		rv.chromosome[i] = newGene(i)
 	}
 	return rv;
 }

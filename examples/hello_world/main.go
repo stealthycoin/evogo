@@ -18,7 +18,7 @@ type Gene struct {
 }
 
 // Define a function for creating a new random gene
-func CreateGene() evogo.Gene {
+func CreateGene(i int) evogo.Gene {
 	return Gene{
 		value: letters[rand.Intn(len(letters))], // Random rune form our letters allowed
 	}
@@ -26,7 +26,7 @@ func CreateGene() evogo.Gene {
 
 // Define a function for mutating a gene, in our case it will simply make a new one
 func MutateGene(g evogo.Gene) evogo.Gene {
-	return CreateGene()
+	return CreateGene(0)
 }
 
 // Function to display an individual (optional),
@@ -41,7 +41,7 @@ func ShowGenes(i *evogo.Individual) {
 // Define a fitness function to evaluate an individual
 // In our case we are just using distance between unicode runes
 // The higher the fitness is the cloesr to our goal the individual is
-func fitness(i *evogo.Individual) int {
+func fitness(i *evogo.Individual, others []*evogo.Individual) int {
 	var f int = 0 // Highest score it can get is 0
 	for i, g := range i.Genes() {
 		gene := g.(Gene) // Need to typecast it from the eve.Gene interface to our custom Gene type

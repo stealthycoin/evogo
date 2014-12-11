@@ -8,7 +8,7 @@ import (
 )
 
 // Fitness evaluation function type
-type fitness func(*Individual) int
+type fitness func(*Individual,[]*Individual) int
 
 // Select two individuals to be mated
 func selectPair(pop* Population) (int,int) {
@@ -93,7 +93,7 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 	for i, _ := range pop.individuals {
 		wg.Add(1)
 		go func (index int) {
-			pop.individuals[index].fitness = fit(pop.individuals[index])
+			pop.individuals[index].fitness = fit(pop.individuals[index], pop.individuals)
 			wg.Done()
 		}(i)
 	}
