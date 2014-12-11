@@ -80,7 +80,6 @@ func main() {
 	var strongest *evogo.Individual
 	if (*train_com) {
 		pop := evogo.NewPopulation(100, 20, 20, CreateGene)
-		pop.SetShowIndividual(ShowGenes)
 		evogo.Train(pop, 2198, Fitness, MutateGene)
 		strongest = pop.Individuals()[0] // Get strongest individual
 	} else {
