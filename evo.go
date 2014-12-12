@@ -29,7 +29,7 @@ func selectPair(pop* Population) (int,int) {
 	// Pick first winner
 	return_i := -1
 	for i, val := range tourny {
-		if rand.Intn(100) < pop.tProb || i == len(tourny)-1{
+		if rand.Float32() < pop.tProb || i == len(tourny)-1{
 			return_i = val
 			tourny = append(tourny[:i], tourny[i+1:]...)
 			break
@@ -39,7 +39,7 @@ func selectPair(pop* Population) (int,int) {
 	// Pick second winner
 	return_j := -1
 	for i, val := range tourny {
-		if rand.Intn(100) < pop.tProb || i == len(tourny)-1{
+		if rand.Float32() < pop.tProb || i == len(tourny)-1{
 			return_j = val
 			break
 		}

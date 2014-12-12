@@ -6,7 +6,7 @@ type Population struct {
 	invertFitness bool // defaults to false, true makes lower fitness better
 	elitism int // How many individuals are tossed into the next generation right away
 	tournament int // How many per tournament in selection phase
-	tProb int // Proability of winning a tournament
+	tProb float32 // Proability of winning a tournament
 	mProb float32 // Proability of a mutation
 	individuals []*Individual
 
@@ -20,7 +20,7 @@ func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 	return &Population{
 		invertFitness: false,
 		elitism: 5,
-		tProb: 75,
+		tProb: .75,
 		mProb: .2,
 		tournament: 20,
 		individuals: newIndividuals(count, minG, maxG, newGene),
@@ -28,23 +28,47 @@ func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 	}
 }
 
+
+// Set whether netagive or positive fitness is "better"
+// false: higher fitness is better
+// true: lower fitness is better
 func (pop *Population) InvertFitness(invert bool) {
 	pop.invertFitness = invert
 }
 
+// Set how many individuals get promoted straight to the next
 func (pop *Population) SetElitism(e int) {
 	pop.elitism = e
+}
+
+// Set how large tournaments are for tournament selection (default is 20)
+func (pop *Population) SetTournamentSize(size int) {
+	pop.tournament = size
+}
+
+// Set probability of the first individual winning the tournament
+func (pop *Population) SetTournamentProbability(prob float32) {
+	pop.tProb = prob
+}
+
+// Set probability of a mutation on a particular individual
+func (pop *Population) SetMutationProbability(prob float32) {
+	pop.mProb = prob
 }
 
 func (pop *Population) SetShowIndividual(fn genedisplay) {
 	pop.showGenes = fn
 }
 
+// Fetch the array of individuals from the population
 func (pop *Population) Individuals() []*Individual {
 	return pop.individuals
 }
 
+
+// *******************************************************
 // Sorting functions for the individuals in the population
+// *******************************************************
 func (p Population) Len() int {
 	return len(p.individuals)
 }
