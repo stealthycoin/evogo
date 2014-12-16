@@ -132,7 +132,7 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 // provide a fitness function and a cutoff
 // to stop training when that fitness is reached
 func Train(pop *Population, cutoff int, fit fitness, m mutate) {
-	maxGenerations := 100
+	maxGenerations := 10000
 	gen := 0
 
 	for gen < maxGenerations {
