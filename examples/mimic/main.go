@@ -23,6 +23,7 @@ var (
 	colorChoices []color.RGBA
 )
 
+// Create a randomized gene
 func CreateGene(i int) evogo.Gene {
 	return Circle{
 		p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
@@ -32,6 +33,7 @@ func CreateGene(i int) evogo.Gene {
 	}
 }
 
+// Evaluate how closely an individual reflects our target image, TODO optimize this
 func fitness(i *evogo.Individual, others []*evogo.Individual) int {
 	dst := image.NewRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{color.RGBA{0,0,0,255}}, image.ZP, draw.Src)
@@ -54,7 +56,7 @@ func fitness(i *evogo.Individual, others []*evogo.Individual) int {
 	return diff
 }
 
-func ShowGenes(i *evogo.Individual) {
+func DumpGene(i *evogo.Individual) {
 	// render
 	dst := image.NewRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{color.RGBA{0,0,0,255}}, image.ZP, draw.Src)
@@ -90,6 +92,7 @@ func preprocess() {
 }
 
 func main() {
+	// Load the image
 	flag.Parse()
 	imgF, _ := os.Open(*target)
 	defer imgF.Close()
@@ -98,11 +101,16 @@ func main() {
 		fmt.Println("decode",err)
 		return
 	}
+
+	// Pre process the image
 	targetImage = tImg
 	preprocess()
 
+	// Generate population
 	pop := evogo.NewPopulation(1000, 100, 100, CreateGene)
+
 	// Configure evolution setting
-	pop.SetShowIndividual(ShowGenes)
+	pop.SetShowIndividual(DumpGene)
+
 	evogo.Train(pop, 0, fitness, MutateGene)
 }
