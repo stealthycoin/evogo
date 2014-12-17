@@ -23,34 +23,6 @@ var (
 	colorChoices []color.RGBA
 )
 
-/** Struct for circle **/
-type Circle struct {
-	p image.Point
-	r int
-	col color.RGBA
-	a color.Alpha
-}
-
-func (c *Circle) ColorModel() color.Model {
-	return color.AlphaModel
-}
-
-func (c *Circle) Bounds() image.Rectangle {
-	return image.Rect(c.p.X-c.r, c.p.Y-c.r, c.p.X+c.r, c.p.Y+c.r)
-}
-
-func (c *Circle) At(x, y int) color.Color {
-	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
-	// if xx*xx+yy*yy < rr*rr {
-	// 	return color.Alpha{255}
-	// }
-	if xx*xx+yy*yy < (rr)*(rr) {
-		return c.a
-	}
-
-	return color.Alpha{0}
-}
-
 func CreateGene(i int) evogo.Gene {
 	return Circle{
 		p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
@@ -106,9 +78,6 @@ func ShowGenes(i *evogo.Individual) {
 	}
 }
 
-func MutateGene(g evogo.Gene) evogo.Gene {
-	return CreateGene(0)
-}
 
 func preprocess() {
 	colorChoices = make([]color.RGBA, 0, targetImage.Bounds().Max.X * targetImage.Bounds().Max.Y)
@@ -133,6 +102,7 @@ func main() {
 	preprocess()
 
 	pop := evogo.NewPopulation(1000, 100, 100, CreateGene)
+	// Configure evolution setting
 	pop.SetShowIndividual(ShowGenes)
 	evogo.Train(pop, 0, fitness, MutateGene)
 }
