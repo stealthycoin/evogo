@@ -31,5 +31,30 @@ func MutateGene(g evogo.Gene) evogo.Gene {
 		c.a.A = 255
 	}
 
+	// Adjust the color (this is the only way to get colors outside the color profile of the original image)
+	dred := uint8(rand.Intn(11)-5) // [-5, 5]
+	c.col.R += dred
+	if c.col.R < 0 {
+		c.col.R = 0
+	} else if c.col.A > 255 {
+		c.col.R = 255
+	}
+
+	dgre := uint8(rand.Intn(11)-5) // [-5, 5]
+	c.col.R += dgre
+	if c.col.G < 0 {
+		c.col.G = 0
+	} else if c.col.G > 255 {
+		c.col.G = 255
+	}
+
+	dblu := uint8(rand.Intn(11)-5) // [-5, 5]
+	c.col.R += dblu
+	if c.col.B < 0 {
+		c.col.B = 0
+	} else if c.col.B > 255 {
+		c.col.B = 255
+	}
+
 	return c
 }
