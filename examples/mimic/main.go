@@ -20,12 +20,15 @@ var (
 	target = flag.String("target", "default.png", "Please set a target image file to load.")
 	targetImage image.Image
 	gen int = 1
+	colorChoices []color.RGBA
 )
 
 /** Struct for circle **/
 type Circle struct {
 	p image.Point
 	r int
+	col color.RGBA
+	a color.Alpha
 }
 
 func (c *Circle) ColorModel() color.Model {
@@ -42,25 +45,18 @@ func (c *Circle) At(x, y int) color.Color {
 	// 	return color.Alpha{255}
 	// }
 	if xx*xx+yy*yy < (rr)*(rr) {
-		return color.Alpha{100}
+		return c.a
 	}
 
 	return color.Alpha{0}
 }
 
-
-type Gene struct {
-	circ Circle
-	col color.RGBA
-}
-
 func CreateGene(i int) evogo.Gene {
-	return Gene{
-		circ: Circle{
-			p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
-			r: rand.Intn(targetImage.Bounds().Max.X / 2 - 5) + 5,
-		},
-		col: color.RGBA{uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), 255},
+	return Circle{
+		p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
+		r: rand.Intn(50) + 5,
+		col: colorChoices[rand.Intn(len(colorChoices))],
+		a: color.Alpha{uint8(rand.Intn(100) + 100)},
 	}
 }
 
@@ -68,11 +64,10 @@ func fitness(i *evogo.Individual, others []*evogo.Individual) int {
 	dst := image.NewRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{color.RGBA{0,0,0,255}}, image.ZP, draw.Src)
 	for _, g := range i.Genes() {
-		gene := g.(Gene)
+		gene := g.(Circle)
 		src := &image.Uniform{gene.col}
-		draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &gene.circ, image.ZP, draw.Over)
+		draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &gene, image.ZP, draw.Over)
 	}
-
 
 	// Compare target image and dst image
 	diff := 0;
@@ -92,9 +87,9 @@ func ShowGenes(i *evogo.Individual) {
 	dst := image.NewRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{color.RGBA{0,0,0,255}}, image.ZP, draw.Src)
 	for _, g := range i.Genes() {
-		gene := g.(Gene)
+		gene := g.(Circle)
 		src := &image.Uniform{gene.col}
-		draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &gene.circ, image.ZP, draw.Over)
+		draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &gene, image.ZP, draw.Over)
 	}
 
 	// Write to a file.
@@ -115,6 +110,15 @@ func MutateGene(g evogo.Gene) evogo.Gene {
 	return CreateGene(0)
 }
 
+func preprocess() {
+	colorChoices = make([]color.RGBA, 0, targetImage.Bounds().Max.X * targetImage.Bounds().Max.Y)
+	for x := 0 ; x < targetImage.Bounds().Max.X ; x++ {
+		for y := 0 ; y < targetImage.Bounds().Max.Y ; y++ {
+			r, g, b, _ := targetImage.At(x,y).RGBA()
+			colorChoices = append(colorChoices, color.RGBA{uint8(r), uint8(g), uint8(b), 255})
+		}
+	}
+}
 
 func main() {
 	flag.Parse()
@@ -125,12 +129,10 @@ func main() {
 		fmt.Println("decode",err)
 		return
 	}
-	fmt.Println(tImg.Bounds())
-	fmt.Println(tImg.At(10,10))
-
 	targetImage = tImg
+	preprocess()
 
-	pop := evogo.NewPopulation(1000, 50, 50, CreateGene)
+	pop := evogo.NewPopulation(1000, 100, 100, CreateGene)
 	pop.SetShowIndividual(ShowGenes)
 	evogo.Train(pop, 0, fitness, MutateGene)
 }
