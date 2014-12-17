@@ -24,11 +24,11 @@ func MutateGene(g evogo.Gene) evogo.Gene {
 
 	// Adjust alpha value
 	da := rand.Intn(11)-5 // [-5, 5]
-	c.a += da
-	if c.a < 0 {
-		c.a = 0
-	} else if c.a > 255 {
-		c.a = 255
+	c.a.A += uint8(da)
+	if c.a.A < 0 {
+		c.a.A = 0
+	} else if c.a.A > 255 {
+		c.a.A = 255
 	}
 
 	return c
