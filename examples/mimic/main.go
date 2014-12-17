@@ -29,13 +29,13 @@ func CreateGene(i int) evogo.Gene {
 		p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
 		r: rand.Intn(50) + 5,
 		col: colorChoices[rand.Intn(len(colorChoices))],
-		a: color.Alpha{uint8(rand.Intn(100) + 100)},
+		a:  color.Alpha{uint8(rand.Intn(100) + 100)},
 	}
 }
 
 // Evaluate how closely an individual reflects our target image, TODO optimize this
 func fitness(i *evogo.Individual, others []*evogo.Individual) int {
-	dst := image.NewRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
+	dst := image.NewNRGBA(image.Rect(0, 0, targetImage.Bounds().Max.X, targetImage.Bounds().Max.Y))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{color.RGBA{0,0,0,255}}, image.ZP, draw.Src)
 	for _, g := range i.Genes() {
 		gene := g.(Circle)
@@ -47,8 +47,9 @@ func fitness(i *evogo.Individual, others []*evogo.Individual) int {
 	diff := 0;
 	for x := 0 ; x < targetImage.Bounds().Max.X ; x++ {
 		for y := 0 ; y < targetImage.Bounds().Max.Y ; y++ {
-			r,g,b,_ := targetImage.At(x,y).RGBA()
-			r2,g2,b2,_ := dst.At(x,y).RGBA()
+			i := dst.PixOffset(x,y)
+			r, g, b := targetImage.(*image.NRGBA).Pix[i], targetImage.(*image.NRGBA).Pix[i+1], targetImage.(*image.NRGBA).Pix[i+2]
+			r2, g2, b2 := dst.Pix[i], dst.Pix[i+1], dst.Pix[i+2]
 			diff -= int(math.Sqrt( float64((r-r2)*(r-r2) + (g-g2)*(g-g2) + (b-b2)*(b-b2)) ))
 		}
 	}
@@ -111,6 +112,7 @@ func main() {
 
 	// Configure evolution setting
 	pop.SetShowIndividual(DumpGene)
+	pop.SetElitism(0)
 
 	evogo.Train(pop, 0, fitness, MutateGene)
 }
