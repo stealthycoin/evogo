@@ -52,23 +52,36 @@ func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
 	pa := pop.individuals[i]
 	pb := pop.individuals[j]
 
-	// Two point crossover (assume lengths are the same for now)
-	firstPoint := rand.Intn(len(pa.chromosome)-1)
-	secondPoint := rand.Intn(len(pa.chromosome)-1)
+	// Two point crossover
+	// Find the longer one and swap it to pa
+	if len(pb.chromosome) > len(pa.chromosome) {
+		pb, pa = pa, pb
+	}
+
+	// Choose an alignment offset, if they are the same length
+	// the offset will always be 0
+	offset := 0
+	if len(pb.chromosome) != len(pa.chromosome) {
+		offset = rand.Intn(len(pa.chromosome) - len(pb.chromosome))
+	}
+
+	// Crossover points are defined with respect to pb
+	firstPoint := rand.Intn(len(pb.chromosome)-1)
+	secondPoint := rand.Intn(len(pb.chromosome)-1)
 	if firstPoint > secondPoint {
 		firstPoint, secondPoint = secondPoint, firstPoint
 	}
 
 	// Make first child
 	ca := make([]Gene,0)
-	ca = append(ca, pa.chromosome[:firstPoint]...)
+	ca = append(ca, pa.chromosome[:firstPoint+offset]...)
 	ca = append(ca, pb.chromosome[firstPoint:secondPoint]...)
-	ca = append(ca, pa.chromosome[secondPoint:]...)
+	ca = append(ca, pa.chromosome[secondPoint+offset:]...)
 
 	// Make second child
 	cb := make([]Gene,0)
 	cb = append(cb, pb.chromosome[:firstPoint]...)
-	cb = append(cb, pa.chromosome[firstPoint:secondPoint]...)
+	cb = append(cb, pa.chromosome[firstPoint+offset:secondPoint+offset]...)
 	cb = append(cb, pb.chromosome[secondPoint:]...)
 
 	// Mutation for first child
