@@ -27,7 +27,7 @@ var (
 func CreateGene(i int) evogo.Gene {
 	return Circle{
 		p: image.Point{rand.Intn(targetImage.Bounds().Max.X), rand.Intn(targetImage.Bounds().Max.Y)},
-		r: rand.Intn(50) + 5,
+		r: rand.Intn(50) + 2,
 		col: colorChoices[rand.Intn(len(colorChoices))],
 		a:  color.Alpha{uint8(rand.Intn(100) + 100)},
 	}
