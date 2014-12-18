@@ -2,10 +2,15 @@ package evogo
 
 import "math/rand"
 
+
+// Definition of an individual
 type Individual struct {
 	fitness int
 	chromosome []Gene
 }
+
+// Function type to mutate an individual
+type mutate func([]Gene)[]Gene
 
 
 // Create a new individual with a known gene

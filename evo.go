@@ -86,13 +86,11 @@ func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
 
 	// Mutation for first child
 	if rand.Float32() < pop.mProb {
-		i := rand.Intn(len(ca))
-		ca[i] = m(ca[i])
+		ca = m(ca)
 	}
 	// Mutation for second child
 	if rand.Float32() < pop.mProb {
-		i := rand.Intn(len(cb))
-		cb[i] = m(cb[i])
+		cb = m(cb)
 	}
 
 	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)

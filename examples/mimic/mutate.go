@@ -5,6 +5,19 @@ import (
 	"github.com/stealthycoin/evogo"
 )
 
+func MutateGenes(gs []evogo.Gene) []evogo.Gene {
+	// Select a gene to mutate
+	i := rand.Intn(len(gs))
+	gs[i] = MutateGene(gs[i])
+
+	// 30% chance of gaining a new gene
+	if rand.Float32() < .3 {
+		gs = append(gs, CreateGene(len(gs)))
+	}
+
+	return gs
+}
+
 func MutateGene(g evogo.Gene) evogo.Gene {
 	c := g.(Circle)
 

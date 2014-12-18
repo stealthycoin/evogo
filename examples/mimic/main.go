@@ -108,11 +108,11 @@ func main() {
 	preprocess()
 
 	// Generate population
-	pop := evogo.NewPopulation(1000, 100, 100, CreateGene)
+	pop := evogo.NewPopulation(500, 10, 20, CreateGene)
 
 	// Configure evolution setting
 	pop.SetShowIndividual(DumpGene)
 	pop.SetElitism(0)
 
-	evogo.Train(pop, 0, fitness, MutateGene)
+	evogo.Train(pop, 0, fitness, MutateGenes)
 }
