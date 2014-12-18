@@ -10,10 +10,8 @@ func MutateGenes(gs []evogo.Gene) []evogo.Gene {
 	i := rand.Intn(len(gs))
 	gs[i] = MutateGene(gs[i])
 
-	// 30% chance of gaining a new gene
-	if rand.Float32() < .3 {
-		gs = append(gs, CreateGene(len(gs)))
-	}
+	// Add a gene
+	gs = append(gs, CreateGene(len(gs)))
 
 	return gs
 }
