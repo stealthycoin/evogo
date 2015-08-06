@@ -17,35 +17,35 @@ func selectPair(pop* Population) (int,int) {
 	for len(indicies) < pop.tournament {
 		indicies[rand.Intn(len(pop.individuals))] = true
 	}
-	tourny := make([]int,0)
+	tourny := make([]int, len(indicies))
+	i := 0
 	for val, _ := range indicies {
-		tourny = append(tourny, val)
+		tourny[i] = val
+		i++
 	}
-
 
 	// Sort by index (this also happens to be fitness)
 	sort.Ints(tourny)
 
-	// Pick first winner
-	return_i := -1
-	for i, val := range tourny {
-		if rand.Float32() < pop.tProb || i == len(tourny)-1{
-			return_i = val
+	// Pick and remove an index from our pool
+	pick := func() int {
+		// Start at 0 and when the function ends clean out the element that was picked
+		i := 0
+		defer func() {
 			tourny = append(tourny[:i], tourny[i+1:]...)
-			break
+		}()
+
+		// Loop through and give each individual a tProb chance of being selected
+		for _, val := range tourny {
+			if rand.Float32() < pop.tProb {
+				return val
+			}
+			i++
 		}
+		return tourny[len(tourny)-1]
 	}
 
-	// Pick second winner
-	return_j := -1
-	for i, val := range tourny {
-		if rand.Float32() < pop.tProb || i == len(tourny)-1{
-			return_j = val
-			break
-		}
-	}
-
-	return return_i, return_j
+	return pick(), pick()
 }
 
 func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
