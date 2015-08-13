@@ -68,7 +68,7 @@ func main() {
 	// The target fitness at which to stop
 	// fitness function to evaluate the fitness of a particular individual
 	start := time.Now()
-	evogo.Train(pop, 0, fitness, MutateGene)
+	evogo.Train(pop, 0, 1000, 40, fitness, MutateGene)
 	elapsed := time.Since(start)
 	fmt.Printf("Took %s\n", elapsed)
 }
