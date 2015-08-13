@@ -11,6 +11,7 @@ import (
 type fitness func(*Individual,[]*Individual) int
 
 // Select two individuals to be mated
+// TODO fix last chosen bug
 func selectPair(pop* Population) (int,int) {
 	// Generate random unique keys then turn into slice
 	indicies := make(map[int]bool)
@@ -37,7 +38,7 @@ func selectPair(pop* Population) (int,int) {
 
 		// Loop through and give each individual a tProb chance of being selected
 		for _, val := range tourny {
-			if rand.Float32() < pop.tProb {
+			if rand.Float64() < pop.tProb {
 				return val
 			}
 			i++
@@ -48,6 +49,10 @@ func selectPair(pop* Population) (int,int) {
 	return pick(), pick()
 }
 
+
+//
+// Breed two individuals i and j together, returns a pair of new individual pointers
+//
 func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
 	pa := pop.individuals[i]
 	pb := pop.individuals[j]
@@ -64,30 +69,33 @@ func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
 	ca = append(ca, pa.chromosome[:firstPoint]...)
 	ca = append(ca, pb.chromosome[firstPoint:secondPoint]...)
 	ca = append(ca, pa.chromosome[secondPoint:]...)
+	// Mutation for first child
+	for i, _ := range ca {
+		if rand.Float64() < pop.mProb {
+			ca[i] = m(ca[i])
+		}
+	}
+
 
 	// Make second child
 	cb := make([]Gene,0)
 	cb = append(cb, pb.chromosome[:firstPoint]...)
 	cb = append(cb, pa.chromosome[firstPoint:secondPoint]...)
 	cb = append(cb, pb.chromosome[secondPoint:]...)
-
-	// Mutation for first child
-	if rand.Float32() < pop.mProb {
-		i := rand.Intn(len(ca))
-		ca[i] = m(ca[i])
-	}
-	// Mutation for second child
-	if rand.Float32() < pop.mProb {
-		i := rand.Intn(len(cb))
-		cb[i] = m(cb[i])
+	for i, _ := range cb {
+		if rand.Float64() < pop.mProb {
+			ca[i] = m(cb[i])
+		}
 	}
 
 	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)
 }
 
-// One Generation score all individuals and breed them
-func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 
+//
+// One Generation score all individuals and breed them
+//
+func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 	// First score all individuals with the fitness function in seperate goroutines
 	var wg sync.WaitGroup
 	for i, _ := range pop.individuals {
@@ -131,17 +139,33 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 // Begin the training on a population,
 // provide a fitness function and a cutoff
 // to stop training when that fitness is reached
-func Train(pop *Population, cutoff int, fit fitness, m mutate) {
-	maxGenerations := 10000
+func Train(pop *Population, cutoff, maxGen, maxPlateau int, fit fitness, m mutate) *Individual {
+	// Set starting genration and best individual
 	gen := 0
+	var fittest *Individual = nil
+	last_fit := cutoff
+	plateau := 0
 
-	for gen < maxGenerations {
+	// Loop until we run out of generataions, or we hit the target, or x generations goes by with no progress
+	for gen < maxGen {
 		gen++
 		fmt.Print("Generation ", gen, "... ")
-		fittest := breedGeneration(pop, fit, m)
+		fittest = breedGeneration(pop, fit, m)
 		fmt.Print("Strongest Candidate: ", fittest.fitness, " ")
 		pop.showGenes(fittest)
 		fmt.Println()
+
+
+		// Check to see if we have plateaued
+		if fittest.fitness == last_fit {
+			plateau++
+			if plateau == maxPlateau {
+				break
+			}
+		} else {
+			plateau = 0
+		}
+		last_fit = fittest.fitness
 
 		// Break early if we got a fitness level at or better than our requirement
 		if pop.invertFitness && fittest.fitness <= cutoff {
@@ -150,4 +174,6 @@ func Train(pop *Population, cutoff int, fit fitness, m mutate) {
 			break
 		}
 	}
+
+	return fittest
 }
