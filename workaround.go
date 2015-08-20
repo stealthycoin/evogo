@@ -1,0 +1,3 @@
+package evogo
+
+import "C"
