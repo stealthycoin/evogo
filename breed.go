@@ -3,12 +3,15 @@ package evogo
 import (
 	
 	"math/rand"
+	_"log"
+
 )
 
-
-
 var (
-	crossoverMap map[string]crossoverFunc
+	breedMap map[string]breedFunc = map[string]breedFunc{
+		"twoPointCrossover":twoPointCrossover,
+		"cyclicCrossover":cyclicCrossover,
+	}
 )
 
 
@@ -53,3 +56,116 @@ func twoPointCrossover(pop *Population, i, j int, m mutate) (*Individual,*Indivi
 	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)
 
 }
+
+//
+// Breed two individuals i and j together using random cycles, returns a pair of new individual pointers
+//
+func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individual){
+	pa := pop.individuals[i]
+	pb := pop.individuals[j]
+
+	
+
+	if len(pa.chromosome) != len(pb.chromosome){
+		panic("Cyclic crossover requires same length chromosomes")
+	}
+
+	//PARENT A
+	// make a random array the length of the chromosome for cyclic crossover
+	list := rand.Perm(len(pa.chromosome))
+	cycleArray := make([]int, 0)
+
+	last_num := 0
+
+	for true {
+	  val := list[last_num]
+	  cycleArray = append(cycleArray, val)
+	  if val == 0 {
+	  	break
+	  }
+	  last_num = val
+	}
+
+	// Make first child
+	ca := make([]Gene,0)
+	//now mix the parents based off our cycleArray
+	cycle_index := 0
+	for i, _ := range pb.chromosome {
+		
+
+		if cycle_index >= len(cycleArray){
+			//we ran out of values in our cycle array
+			ca = append(ca, pb.chromosome[i])
+			
+		} else if i == cycleArray[cycle_index] {
+			//grabbing from cycle array
+			ca = append(ca, pa.chromosome[i])
+			cycle_index++
+
+		} else {
+			//grabbing from other parent array
+			ca = append(ca, pb.chromosome[i])
+		}
+		
+	
+	}
+
+	
+	//PARENT B
+	// make a random array the length of the chromosome for cyclic crossover
+	list = rand.Perm(len(pb.chromosome))
+	cycleArray = make([]int, 0)
+
+	last_num = 0
+
+	for true {
+	  val := list[last_num]
+	  cycleArray = append(cycleArray, val)
+	  if val == 0 {
+	  	break
+	  }
+	  last_num = val
+	}
+
+	// Make first child
+	cb := make([]Gene,0)
+	//now mix the parents based off our cycleArray
+	cycle_index = 0
+	for i, _ := range pb.chromosome {
+		
+		if cycle_index >= len(cycleArray){
+			//we ran out of values in our cycle array
+			cb = append(cb, pa.chromosome[i])
+			
+		} else if i == cycleArray[cycle_index] {
+			//grabbing from cycle array
+			cb = append(cb, pb.chromosome[i])
+			cycle_index++
+
+		} else {
+			//grabbing from other parent array
+			cb = append(cb, pa.chromosome[i])
+		}
+		
+	
+	}
+
+	
+
+	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -53,9 +53,7 @@ func selectPair(pop* Population) (int,int) {
 // Breed two individuals i and j together based on the population's crossover type
 //
 func breed(pop *Population, i, j int, m mutate) (*Individual,*Individual) {
-	
-
-	
+	return breedMap[pop.breedMethod](pop, i, j, m)
 }
 
 
