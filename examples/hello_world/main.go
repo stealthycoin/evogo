@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/stealthycoin/evogo"
+	"github.com/blakedallen/evogo"
 	"fmt"
 	"math/rand"
 	"time"
@@ -60,15 +60,16 @@ func main() {
 	// 100 Individuals
 	// 13 Genes per individual
 	// And our custom CreateGene function used to make the genes
-	pop := evogo.NewPopulation(1000, 13, 13, CreateGene)
+	pop := evogo.NewPopulation(5000, 13, 13, CreateGene)
 	pop.SetShowIndividual(ShowGenes) // Give it our show function
+	pop.SetBreedMethod("cyclicCrossover")
 
 	// Call the train function and provide it with
 	// The population to train
 	// The target fitness at which to stop
 	// fitness function to evaluate the fitness of a particular individual
 	start := time.Now()
-	evogo.Train(pop, 0, 1000, 40, fitness, MutateGene)
+	evogo.Train(pop, 0, 1000, 1000, fitness, MutateGene)
 	elapsed := time.Since(start)
 	fmt.Printf("Took %s\n", elapsed)
 }

@@ -9,6 +9,7 @@ type Population struct {
 	tProb          float64 // Proability of winning a tournament
 	mProb          float64 // Proability of a mutation
 	individuals    []*Individual
+	breedMethod string //What is the crossover algorithm (2 point, cyclic)
 
 	// Extra functions
 	showGenes genedisplay // function to print a gene sequence
@@ -25,6 +26,7 @@ func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 		tournament:    20,
 		individuals:   newIndividuals(count, minG, maxG, newGene),
 		showGenes:     func(*Individual){},
+		breedMethod: "twoPointCrossover",
 	}
 }
 
@@ -41,6 +43,13 @@ func (pop *Population) InvertFitness(invert bool) {
 //
 func (pop *Population) SetElitism(e int) {
 	pop.elitism = e
+}
+
+//
+//  Set breed function, options: ['cyclicCrossover', 'twoPointCrossover']
+//
+func (pop *Population) SetBreedMethod(b string) {
+	pop.breedMethod = b
 }
 
 
