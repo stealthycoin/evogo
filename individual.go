@@ -49,3 +49,8 @@ func newIndividuals(count, minG, maxG int, newGene newgene) []*Individual {
 func (i *Individual) Genes() []Gene {
 	return i.chromosome
 }
+
+// Get the fitness from an individual
+func (i *Individual) Fitness() int {
+	return i.fitness
+}

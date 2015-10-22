@@ -150,8 +150,6 @@ func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individu
 	
 	}
 
-	
-
 	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)
 
 }

@@ -135,7 +135,7 @@ func Train(pop *Population, cutoff, maxGen, maxPlateau int, fit fitness, m mutat
 		// Break early if we got a fitness level at or better than our requirement
 		if pop.invertFitness && fittest.fitness <= cutoff {
 			break
-		} else if fittest.fitness >= cutoff {
+		} else if !pop.invertFitness && fittest.fitness >= cutoff {
 			break
 		}
 	}
