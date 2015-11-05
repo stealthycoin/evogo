@@ -72,6 +72,16 @@ func breedGeneration(pop *Population, fit fitness, m mutate) *Individual {
 	}
 	wg.Wait()
 
+	//calculate diversity (optional)
+	if pop.diversityFunc != nil {
+		//for now the user will iterate through the individuals
+		pop.diversityFunc(pop.individuals)	
+
+		// for i, _ := range pop.individuals {
+		// 	fmt.Println( pop.individuals[i].Diversity() )
+		// }
+	}
+
 	// Sort by fitness level
 	sort.Sort(pop)
 

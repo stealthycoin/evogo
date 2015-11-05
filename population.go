@@ -10,9 +10,21 @@ type Population struct {
 	mProb          float64 // Proability of a mutation
 	individuals    []*Individual
 	breedMethod string //What is the crossover algorithm (2 point, cyclic)
+	diversityFunc func([]*Individual) //optional diversity function
+
 
 	// Extra functions
 	showGenes genedisplay // function to print a gene sequence
+
+	//tranform variables
+	minFitness int
+	minDiversity int
+	maxFitness int
+	maxDiversity int
+	//store these during the fitness / diversity calc
+	//perform a linear tranform (normalize values)
+	//create a combined fitness / diversity metric, which is distance from max div, max fitness
+	//less will compare the combined fitness
 }
 
 
@@ -27,6 +39,7 @@ func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 		individuals:   newIndividuals(count, minG, maxG, newGene),
 		showGenes:     func(*Individual){},
 		breedMethod: "twoPointCrossover",
+		diversityFunc: nil,
 	}
 }
 
@@ -78,10 +91,17 @@ func (pop *Population) SetMutationProbability(prob float64) {
 
 
 //
-//
+// Set the printing function
 //
 func (pop *Population) SetShowIndividual(fn genedisplay) {
 	pop.showGenes = fn
+}
+
+//
+// Set our optional diveristy function
+//
+func (pop *Population) SetDiversityFunction(fn diversityFunc) {
+	pop.diversityFunc = fn
 }
 
 //
@@ -101,7 +121,7 @@ func (p Population) Len() int {
 
 
 //
-//
+// Swapping function for the individuals in the population
 //
 func (p Population) Swap(i, j int) {
 	p.individuals[i], p.individuals[j] = p.individuals[j], p.individuals[i]
@@ -109,7 +129,7 @@ func (p Population) Swap(i, j int) {
 
 
 //
-//
+// 
 //
 func (p Population) Less(i, j int) bool {
 	if p.invertFitness {

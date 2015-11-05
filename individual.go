@@ -5,6 +5,7 @@ import "math/rand"
 type Individual struct {
 	fitness int
 	chromosome []Gene
+	diversity int
 }
 
 
@@ -13,6 +14,7 @@ func newIndividualWithGenes(chrom []Gene) *Individual {
 	return &Individual{
 		fitness: 0,
 		chromosome: chrom,
+		diversity: 0,
 	}
 }
 
@@ -54,3 +56,16 @@ func (i *Individual) Genes() []Gene {
 func (i *Individual) Fitness() int {
 	return i.fitness
 }
+
+// Get the fitness from an individual
+func (i *Individual) Diversity() int {
+	return i.diversity
+}
+
+// 
+// Add diversity to this individual
+//
+func (i *Individual) IncreaseDiversity(div int){
+	i.diversity += div
+}
+
