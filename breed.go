@@ -8,71 +8,80 @@ import (
 )
 
 var (
-	breedMap map[string]breedFunc = map[string]breedFunc{
+	breedMap map[string]BreedFunc = map[string]BreedFunc{
 		"twoPointCrossover":twoPointCrossover,
 		"cyclicCrossover":cyclicCrossover,
 	}
 )
 
+func diversityCalc(pop *Population, c *Individual, parents []*Individual) int {
+	return pop.DiversityFunc(c, parents)
+}
 
 //
 // Breed two individuals i and j together, returns a pair of new individual pointers
 //
-func twoPointCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individual){
-	pa := pop.individuals[i]
-	pb := pop.individuals[j]
+func twoPointCrossover(pop *Population, i, j int, m Mutate) (*Individual,*Individual){
+	pa := pop.Individuals[i]
+	pb := pop.Individuals[j]
 
 	// Two point crossover (assume lengths are the same for now)
-	firstPoint := rand.Intn(len(pa.chromosome)-1)
-	secondPoint := rand.Intn(len(pa.chromosome)-1)
+	firstPoint := rand.Intn(len(pa.Chromosome)-1)
+	secondPoint := rand.Intn(len(pa.Chromosome)-1)
 	if firstPoint > secondPoint {
 		firstPoint, secondPoint = secondPoint, firstPoint
 	}
 
 	// Make first child
 	ca := make([]Gene,0)
-	ca = append(ca, pa.chromosome[:firstPoint]...)
-	ca = append(ca, pb.chromosome[firstPoint:secondPoint]...)
-	ca = append(ca, pa.chromosome[secondPoint:]...)
+	ca = append(ca, pa.Chromosome[:firstPoint]...)
+	ca = append(ca, pb.Chromosome[firstPoint:secondPoint]...)
+	ca = append(ca, pa.Chromosome[secondPoint:]...)
 	// Mutation for first child
 	for i, _ := range ca {
-		if rand.Float64() < pop.mProb {
+		if rand.Float64() < pop.MProb {
 			ca[i] = m(ca[i])
 		}
 	}
 
-
 	// Make second child
 	cb := make([]Gene,0)
-	cb = append(cb, pb.chromosome[:firstPoint]...)
-	cb = append(cb, pa.chromosome[firstPoint:secondPoint]...)
-	cb = append(cb, pb.chromosome[secondPoint:]...)
+	cb = append(cb, pb.Chromosome[:firstPoint]...)
+	cb = append(cb, pa.Chromosome[firstPoint:secondPoint]...)
+	cb = append(cb, pb.Chromosome[secondPoint:]...)
 	for i, _ := range cb {
-		if rand.Float64() < pop.mProb {
+		if rand.Float64() < pop.MProb {
 			ca[i] = m(cb[i])
 		}
 	}
 
-	return newIndividualWithGenes(ca), newIndividualWithGenes(cb)
+	//calculate the diversity here (since we still have the parents)
+	childA := newIndividualWithGenes(ca)
+	childB := newIndividualWithGenes(cb)
+	
+	if pop.DiversityFunc != nil {
+		childA.Diversity = diversityCalc(pop, childA, []*Individual{pa, pb})
+		childB.Diversity = diversityCalc(pop, childB, []*Individual{pa, pb})
+	}
 
+	return childA,childB 
 }
 
 //
 // Breed two individuals i and j together using random cycles, returns a pair of new individual pointers
 //
-func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individual){
-	pa := pop.individuals[i]
-	pb := pop.individuals[j]
-
+func cyclicCrossover(pop *Population, i, j int, m Mutate) (*Individual,*Individual){
+	pa := pop.Individuals[i]
+	pb := pop.Individuals[j]
 	
 
-	if len(pa.chromosome) != len(pb.chromosome){
+	if len(pa.Chromosome) != len(pb.Chromosome){
 		panic("Cyclic crossover requires same length chromosomes")
 	}
 
 	//PARENT A
 	// make a random array the length of the chromosome for cyclic crossover
-	list := rand.Perm(len(pa.chromosome))
+	list := rand.Perm(len(pa.Chromosome))
 	cycleArray := make([]int, 0)
 
 	last_num := 0
@@ -90,21 +99,21 @@ func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individu
 	ca := make([]Gene,0)
 	//now mix the parents based off our cycleArray
 	cycle_index := 0
-	for i, _ := range pb.chromosome {
+	for i, _ := range pb.Chromosome {
 		
 
 		if cycle_index >= len(cycleArray){
 			//we ran out of values in our cycle array
-			ca = append(ca, pb.chromosome[i])
+			ca = append(ca, pb.Chromosome[i])
 			
 		} else if i == cycleArray[cycle_index] {
 			//grabbing from cycle array
-			ca = append(ca, pa.chromosome[i])
+			ca = append(ca, pa.Chromosome[i])
 			cycle_index++
 
 		} else {
 			//grabbing from other parent array
-			ca = append(ca, pb.chromosome[i])
+			ca = append(ca, pb.Chromosome[i])
 		}
 		
 	
@@ -113,7 +122,7 @@ func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individu
 	
 	//PARENT B
 	// make a random array the length of the chromosome for cyclic crossover
-	list = rand.Perm(len(pb.chromosome))
+	list = rand.Perm(len(pb.Chromosome))
 	cycleArray = make([]int, 0)
 
 	last_num = 0
@@ -131,20 +140,20 @@ func cyclicCrossover(pop *Population, i, j int, m mutate) (*Individual,*Individu
 	cb := make([]Gene,0)
 	//now mix the parents based off our cycleArray
 	cycle_index = 0
-	for i, _ := range pb.chromosome {
+	for i, _ := range pb.Chromosome {
 		
 		if cycle_index >= len(cycleArray){
 			//we ran out of values in our cycle array
-			cb = append(cb, pa.chromosome[i])
+			cb = append(cb, pa.Chromosome[i])
 			
 		} else if i == cycleArray[cycle_index] {
 			//grabbing from cycle array
-			cb = append(cb, pb.chromosome[i])
+			cb = append(cb, pb.Chromosome[i])
 			cycle_index++
 
 		} else {
 			//grabbing from other parent array
-			cb = append(cb, pa.chromosome[i])
+			cb = append(cb, pa.Chromosome[i])
 		}
 		
 	
