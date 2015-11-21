@@ -140,7 +140,7 @@ func breedGeneration(pop *Population, fit fitness, m Mutate) *Individual {
 	nextGen = append(nextGen, pop.Individuals[0:pop.Elitism]...)
 
 	//Create our hobo's and add them
-	nextGen = append(nextGen, newIndividuals(pop.Hoboism, pop.MinG, pop.MaxG , pop.NewGene)...)
+	nextGen = append(nextGen, newIndividuals(pop.Randomism, pop.MinG, pop.MaxG , pop.NewGene)...)
 	
 	// Sort by fitness level
 	sort.Sort(ByCombinedFitness(*pop))

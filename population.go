@@ -5,7 +5,7 @@ package evogo
 type Population struct {
 	InvertFitness  bool    // defaults to false, true makes lower fitness better
 	Elitism        int     // How many individuals are tossed into the next generation right away
-	Hoboism        int     // How many hobos (random individuals) are tossed into the next generation right away
+	Randomism      int     // How many random individuals are tossed into the next generation right away
 	Tournament     int     // How many per tournament in selection phase
 	TProb          float64 // Proability of winning a tournament
 	MProb          float64 // Proability of a mutation
@@ -47,7 +47,7 @@ func NewPopulation(count, minG, maxG int, newGene NewGene) *Population {
 	return &Population{
 		InvertFitness: false,
 		Elitism:       5,
-		Hoboism:       0,
+		Randomism:       0,
 		TProb:         0.75,
 		MProb:         0.05,
 		Tournament:    20,
@@ -82,8 +82,8 @@ func (pop *Population) SetElitism(e int) {
 //
 // Set how many random individuals get promoted straight to the next generation
 //
-func (pop *Population) SetHoboism(e int) {
-	pop.Hoboism = e
+func (pop *Population) SetRandomism(e int) {
+	pop.Randomism = e
 }
 
 
