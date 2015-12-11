@@ -3,30 +3,64 @@ package evogo
 
 // This is a population of individuals upon which various operations can be performed
 type Population struct {
-	invertFitness  bool    // defaults to false, true makes lower fitness better
-	elitism        int     // How many individuals are tossed into the next generation right away
-	tournament     int     // How many per tournament in selection phase
-	tProb          float64 // Proability of winning a tournament
-	mProb          float64 // Proability of a mutation
-	individuals    []*Individual
-	breedMethod string //What is the crossover algorithm (2 point, cyclic)
+	InvertFitness  bool    // defaults to false, true makes lower fitness better
+	Elitism        int     // How many individuals are tossed into the next generation right away
+	Randomism      int     // How many random individuals are tossed into the next generation right away
+	Tournament     int     // How many per tournament in selection phase
+	TProb          float64 // Proability of winning a tournament
+	MProb          float64 // Proability of a mutation
+	Individuals    []*Individual
+	BreedMethod    string  //What is the crossover algorithm (2 point, cyclic)
+	DiversityFunc func(*Individual, []*Individual) int //optional diversity function
+	LoopFunc func(*Population, int, int)
+	MinG        int // minimum number of genes a chromosome is allowed to have
+	MaxG        int // maximum number of genes a chromosome is allowed to have
+	NewGene func(int)Gene //create gene function
 
 	// Extra functions
-	showGenes genedisplay // function to print a gene sequence
+	ShowGenes GeneDisplay // function to print a gene sequence
+
+	//tranform variables
+	MinFitness int
+	MaxFitness int
+	MinDiversity int
+	MaxDiversity int
+
+	//weighting metrics used when normalizing
+	FitnessWeight float64
+	DiversityWeight float64
+
+
+	
+	//store these during the fitness / diversity calc
+	//perform a linear tranform (normalize values)
+	//create a combined fitness / diversity metric, which is distance from max div, max fitness
+	//less will compare the combined fitness
 }
+
+type ByFitness Population
+type ByCombinedFitness Population
 
 
 // Create a new population
-func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
+func NewPopulation(count, minG, maxG int, newGene NewGene) *Population {
 	return &Population{
-		invertFitness: false,
-		elitism:       5,
-		tProb:         0.75,
-		mProb:         0.05,
-		tournament:    20,
-		individuals:   newIndividuals(count, minG, maxG, newGene),
-		showGenes:     func(*Individual){},
-		breedMethod: "twoPointCrossover",
+		InvertFitness: false,
+		Elitism:       5,
+		Randomism:       0,
+		TProb:         0.75,
+		MProb:         0.05,
+		Tournament:    20,
+		Individuals:   newIndividuals(count, minG, maxG, newGene),
+		ShowGenes:     func(*Individual){},
+		LoopFunc:     func(*Population, int, int){},
+		BreedMethod: "twoPointCrossover",
+		DiversityFunc: nil,
+		FitnessWeight: 1.0,
+		DiversityWeight: 1.0,
+		NewGene: newGene,
+		MinG: minG,
+		MaxG: maxG,
 	}
 }
 
@@ -34,22 +68,30 @@ func NewPopulation(count, minG, maxG int, newGene newgene) *Population {
 // Set whether negative or positive fitness is "better"
 // false: higher fitness is better
 // true: lower fitness is better
-func (pop *Population) InvertFitness(invert bool) {
-	pop.invertFitness = invert
+func (pop *Population) SetInvertFitness(invert bool) {
+	pop.InvertFitness = invert
 }
 
 //
-// Set how many individuals get promoted straight to the next
+// Set how many individuals get promoted straight to the next generation
 //
 func (pop *Population) SetElitism(e int) {
-	pop.elitism = e
+	pop.Elitism = e
 }
+
+//
+// Set how many random individuals get promoted straight to the next generation
+//
+func (pop *Population) SetRandomism(e int) {
+	pop.Randomism = e
+}
+
 
 //
 //  Set breed function, options: ['cyclicCrossover', 'twoPointCrossover']
 //
 func (pop *Population) SetBreedMethod(b string) {
-	pop.breedMethod = b
+	pop.BreedMethod = b
 }
 
 
@@ -57,7 +99,7 @@ func (pop *Population) SetBreedMethod(b string) {
 // Set how large tournaments are for tournament selection (default is 20)
 //
 func (pop *Population) SetTournamentSize(size int) {
-	pop.tournament = size
+	pop.Tournament = size
 }
 
 
@@ -65,7 +107,7 @@ func (pop *Population) SetTournamentSize(size int) {
 // Set probability of the first individual winning the tournament
 //
 func (pop *Population) SetTournamentProbability(prob float64) {
-	pop.tProb = prob
+	pop.TProb = prob
 }
 
 
@@ -73,47 +115,118 @@ func (pop *Population) SetTournamentProbability(prob float64) {
 // Set probability of a mutation on a particular individual
 //
 func (pop *Population) SetMutationProbability(prob float64) {
-	pop.mProb = prob
+	pop.MProb = prob
+}
+
+//
+// Get probability of a mutation on a particular individual
+//
+func (pop *Population) GetMutationProbability() float64{
+	return pop.MProb
 }
 
 
 //
+// Set the printing function
 //
-//
-func (pop *Population) SetShowIndividual(fn genedisplay) {
-	pop.showGenes = fn
+func (pop *Population) SetShowIndividual(fn GeneDisplay) {
+	pop.ShowGenes = fn
 }
+//
+// Set LoopFunc, a function ran every generation
+//
+func (pop *Population) SetLoopFunction(fn LoopFunc){
+	pop.LoopFunc = fn
+}
+
+//
+// Set our optional diveristy function
+//
+func (pop *Population) SetDiversityFunction(fn DiversityFunc) {
+	pop.DiversityFunc = fn
+}
+
+//
+// Set Diversity Weight
+//
+func (pop *Population) SetDiversityWeight(w float64){
+	pop.DiversityWeight = w
+} 
+
+//
+// Get Diversity Weight
+//
+func (pop *Population) GetDiversityWeight() float64{
+	return pop.DiversityWeight
+} 
+
+
+//
+// Set Fitness Weight
+//
+func (pop *Population) SetFitnessWeight(w float64){
+	pop.FitnessWeight = w
+} 
+
+
 
 //
 // Fetch the array of individuals from the population
 //
-func (pop *Population) Individuals() []*Individual {
-	return pop.individuals
+func (pop *Population) GetIndividuals() []*Individual {
+	return pop.Individuals
 }
 
 
 //
 // Sorting functions for the individuals in the population
 //
-func (p Population) Len() int {
-	return len(p.individuals)
+func (p ByFitness) Len() int {
+	return len(p.Individuals)
 }
 
 
 //
+// Swapping function for the individuals in the population
 //
-//
-func (p Population) Swap(i, j int) {
-	p.individuals[i], p.individuals[j] = p.individuals[j], p.individuals[i]
+func (p ByFitness) Swap(i, j int) {
+	p.Individuals[i], p.Individuals[j] = p.Individuals[j], p.Individuals[i]
 }
 
 
 //
+// 
 //
-//
-func (p Population) Less(i, j int) bool {
-	if p.invertFitness {
-		return p.individuals[i].fitness < p.individuals[j].fitness
+func (p ByFitness) Less(i, j int) bool {
+	if p.InvertFitness {
+		return p.Individuals[i].Fitness < p.Individuals[j].Fitness
 	}
-	return p.individuals[i].fitness > p.individuals[j].fitness
+	return p.Individuals[i].Fitness > p.Individuals[j].Fitness
+}
+
+
+//
+// Sort by Combined Fitness
+//
+func (p ByCombinedFitness) Len() int {
+	return len(p.Individuals)
+}
+
+
+//
+// Swapping function for the individuals in the population (Combined Fitness)
+//
+func (p ByCombinedFitness) Swap(i, j int) {
+	p.Individuals[i], p.Individuals[j] = p.Individuals[j], p.Individuals[i]
+}
+
+
+//
+// Less function for individuals in the population (Combined Fitness)
+//
+func (p ByCombinedFitness) Less(i, j int) bool {
+	if p.InvertFitness {
+		return p.Individuals[i].CombinedFitness < p.Individuals[j].CombinedFitness
+	}
+	return p.Individuals[i].CombinedFitness > p.Individuals[j].CombinedFitness
 }
